@@ -1,0 +1,4 @@
+.git/
+.idea/
+*NOTES.txt
+*_helpers.tpl

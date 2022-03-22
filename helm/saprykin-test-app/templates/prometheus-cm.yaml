@@ -1,0 +1,24 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: cm-{{ .Values.prometheusName }}
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 3s
+    
+      external_labels:
+        monitor: "{{ .Values.appName }}"
+    
+    rule_files:
+    
+    scrape_configs:
+      - job_name: "{{ .Values.prometheusName }}"
+        static_configs:
+          - targets: ["svc-{{ .Values.prometheusName }}:{{ .Values.servicePrometheus.port }}"]
+    
+      - job_name: "{{ .Values.appName }}"
+        static_configs:
+          - targets: ["svc-{{ .Values.appName }}:{{ .Values.serviceApp.port }}"]
+        
+      

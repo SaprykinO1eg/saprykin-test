@@ -1,0 +1,51 @@
+namespace: default
+
+appName: saprykin-test-app
+imageApp:
+  repository: 01eg/saprykin-test-app
+  pullPolicy: IfNotPresent
+  tag: "v1"
+
+serviceApp:
+  type: NodePort
+  port: 8080
+  nodePort: 30030
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+labels:
+  app: saprykin-test-app
+  owner: Saprykin
+
+
+grafanaName: grafana
+imageGrafana:
+  repository: grafana/grafana
+  pullPolicy: IfNotPresent
+  tag: "5.1.0"
+
+serviceGrafana:
+  type: NodePort
+  port: 3000
+  nodePort: 30040
+
+prometheusName: prometheus
+imagePrometheus:
+  repository: prom/prometheus
+  pullPolicy: IfNotPresent
+  tag: "v2.2.1"
+
+servicePrometheus:
+  type: ClusterIP
+  port: 9090
+
+ingressName: saprykin-test-app-ingress
+ingress:
+  enabled: true
+imagePullSecrets: ['default']

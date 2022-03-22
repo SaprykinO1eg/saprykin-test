@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-{{ .Values.appName }}
+spec:
+  rules:
+    - host: {{ .Values.appName }}.test
+      http:
+        paths:
+          - path: /hello
+            pathType: Prefix
+            backend:
+              service:
+                name: svc-{{ .Values.appName }}
+                port:
+                  number: {{ .Values.serviceApp.port }}
+    - host: {{ .Values.grafanaName }}.test
+      http:
+        paths:
+          - path: /d
+            pathType: Prefix
+            backend:
+              service:
+                name: svc-{{ .Values.grafanaName }}
+                port:
+                  number: {{ .Values.serviceGrafana.port }}

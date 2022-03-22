@@ -1,0 +1,80 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ .Values.grafanaName }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: {{ .Values.grafanaName }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.grafanaName }}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: {{ .Values.grafanaName }}
+    spec:
+      restartPolicy: Always
+      serviceAccountName: default
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
+      securityContext: {}
+      containers:
+        - resources:
+            limits:
+              cpu: 200m
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          terminationMessagePath: /dev/termination-log
+          name: {{ .Values.grafanaName }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: {{ .Values.grafanaName }}-datasources
+              mountPath: /etc/grafana/provisioning/datasources
+            - name: {{ .Values.grafanaName }}-dashboard
+              mountPath: /etc/grafana/provisioning/dashboards
+            - name: {{ .Values.grafanaName }}-dashboards
+              mountPath: /var/lib/grafana/dashboards
+            - name: {{ .Values.grafanaName }}-storage
+              mountPath: /var/lib/grafana
+            - name: {{ .Values.grafanaName }}-config
+              mountPath: /etc/grafana
+          terminationMessagePolicy: File
+          image: {{ .Values.imageGrafana.repository }}:{{ .Values.imageGrafana.tag }}
+          args:
+            - '-config=/etc/grafana/grafana.ini'
+      serviceAccount: default
+      volumes:
+        - name: {{ .Values.grafanaName }}-datasources
+          secret:
+            defaultMode: 420
+            secretName: secret-{{ .Values.grafanaName }}-datasources
+        - name: {{ .Values.grafanaName }}-dashboards
+          configMap:
+            defaultMode: 420
+            name: cm-{{ .Values.grafanaName }}-dashboards
+        - name: {{ .Values.grafanaName }}-dashboard
+          configMap:
+            defaultMode: 420
+            name: cm-{{ .Values.grafanaName }}-dashboard
+        - name: {{ .Values.grafanaName }}-storage
+          emptyDir: {}
+        - name: {{ .Values.grafanaName }}-config
+          configMap:
+            name: cm-{{ .Values.grafanaName }}-config
+            defaultMode: 420
+      dnsPolicy: ClusterFirst
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  revisionHistoryLimit: 5
+  progressDeadlineSeconds: 600

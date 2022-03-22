@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.grafanaName }}
+  name: svc-{{ .Values.grafanaName }}
+spec:
+  ports:
+    - port: {{ .Values.serviceGrafana.port }}
+      protocol: TCP
+      targetPort: {{ .Values.serviceGrafana.port }}
+  selector:
+    app: {{ .Values.grafanaName }}
+  sessionAffinity: None
+  type: {{ .Values.serviceGrafana.type }}

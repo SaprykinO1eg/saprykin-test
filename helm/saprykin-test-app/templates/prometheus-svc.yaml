@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: {{ .Values.prometheusName }}
+  name: svc-{{ .Values.prometheusName }}
+spec:
+  ports:
+    - port: {{ .Values.servicePrometheus.port }}
+      protocol: TCP
+      targetPort: {{ .Values.servicePrometheus.port }}
+  selector:
+    app: {{ .Values.prometheusName }}
+  sessionAffinity: None
+  type: {{ .Values.servicePrometheus.type }}
